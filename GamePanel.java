@@ -15,7 +15,7 @@ import javax.swing.*;
 public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     // dimensions of window
-    public static final int GAME_WIDTH = 600;
+    public static final int GAME_WIDTH = 400;
     public static final int GAME_HEIGHT = 600;
 
     public Thread gameThread;
@@ -24,11 +24,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     public Ball ball;
 
     public GamePanel() {
-        ball = new Ball(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2,
-                (int) (Ball.BALL_DIAMETER / 2 + (Math.random() * (GAME_HEIGHT -
-                        Ball.BALL_DIAMETER))));
-        // ball = new Ball(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 -
-        // Ball.BALL_DIAMETER / 2);
+        ball = new Ball(GAME_WIDTH / 2, GAME_HEIGHT / 2);
 
         this.setFocusable(true); // make everything in this class appear on the screen
         this.addKeyListener(this); // start listening for keyboard input
