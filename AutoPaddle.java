@@ -10,7 +10,7 @@ import java.awt.*;
 public class AutoPaddle extends Rectangle {
 
     public int yVelocity;
-    public final int SPEED = 5;
+    public final int SPEED = 2;
     public static final int PADDLE_LENGTH = 150;
     public static final int PADDLE_THICKNESS = 10;
 
