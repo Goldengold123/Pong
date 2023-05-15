@@ -15,16 +15,20 @@ import javax.swing.*;
 public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     // dimensions of window
-    public static final int GAME_WIDTH = 400;
+    public static final int GAME_WIDTH = 500;
     public static final int GAME_HEIGHT = 600;
 
     public Thread gameThread;
     public Image image;
     public Graphics graphics;
     public Ball ball;
+    public Paddle paddle;
+    public AutoPaddle paddle2;
 
     public GamePanel() {
-        ball = new Ball(GAME_WIDTH / 2, GAME_HEIGHT / 2);
+        ball = new Ball(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
+        paddle = new Paddle(0, GAME_HEIGHT / 2 - Paddle.PADDLE_LENGTH / 2);
+        paddle2 = new AutoPaddle(GAME_WIDTH - AutoPaddle.PADDLE_THICKNESS, GAME_HEIGHT / 2 - Paddle.PADDLE_LENGTH / 2);
 
         this.setFocusable(true); // make everything in this class appear on the screen
         this.addKeyListener(this); // start listening for keyboard input
@@ -56,6 +60,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     // call the draw methods in each class to update positions as things move
     public void draw(Graphics g) {
+        paddle.draw(g);
+        paddle2.draw(g);
         ball.draw(g);
     }
 
@@ -64,26 +70,59 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     // fluid and natural. If we take this out the movements appear sluggish and
     // laggy
     public void move() {
+        paddle.move();
+        paddle2.move(ball);
         ball.move();
     }
 
     // handles all collision detection and responds accordingly
     public void checkCollision() {
 
-        // force player to remain on screen
+        // stop player paddle if top or bottom edges hit
+        if (paddle.y <= 0) {
+            paddle.y = 0;
+        }
+        if (paddle.y >= GAME_HEIGHT - Paddle.PADDLE_LENGTH) {
+            paddle.y = GAME_HEIGHT - Paddle.PADDLE_LENGTH;
+        }
+
+        // stop auto paddle if top or bottom edges hit
+        if (paddle2.y <= 0) {
+            paddle2.y = 0;
+        }
+        if (paddle2.y >= GAME_HEIGHT - AutoPaddle.PADDLE_LENGTH) {
+            paddle2.y = GAME_HEIGHT - AutoPaddle.PADDLE_LENGTH;
+        }
+
+        // bounce ball if top or bottom edges hit
         if (ball.y <= 0) {
             ball.flipYDirection();
         }
         if (ball.y >= GAME_HEIGHT - Ball.BALL_DIAMETER) {
             ball.flipYDirection();
         }
-        if (ball.x <= 0) {
+
+        // bounce if player paddle hit
+        if (0 <= ball.x - paddle.x && ball.x - paddle.x <= Paddle.PADDLE_THICKNESS
+                && -Ball.BALL_DIAMETER <= ball.y - paddle.y && ball.y - paddle.y <= Paddle.PADDLE_LENGTH) {
             ball.flipXDirection();
+            ball.x = Paddle.PADDLE_THICKNESS;
         }
-        if (ball.x + Ball.BALL_DIAMETER >= GAME_WIDTH) {
-            ball.flipXDirection();
+        // reset ball if left edge hit and paddle not hit
+        else if (ball.x <= 0) {
+            ball.reset(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
         }
 
+        // bounce if auto paddle hit
+        if (0 <= paddle2.x - ball.x && paddle2.x - ball.x <= Ball.BALL_DIAMETER
+                && -Ball.BALL_DIAMETER <= ball.y - paddle2.y && ball.y - paddle2.y <= AutoPaddle.PADDLE_LENGTH) {
+            ball.flipXDirection();
+            ball.x = GAME_WIDTH - AutoPaddle.PADDLE_THICKNESS - Ball.BALL_DIAMETER;
+        }
+        // reset ball if right edge hit and paddle not hit
+        else if (ball.x >= GAME_WIDTH - Ball.BALL_DIAMETER) {
+            ball.reset(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
+        }
     }
 
     // run() method is what makes the game continue running without end. It calls
@@ -116,13 +155,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     // if a key is pressed, we'll send it over to the PlayerBall class for
     // processing
     public void keyPressed(KeyEvent e) {
-        // paddle.keyPressed(e);
+        paddle.keyPressed(e);
     }
 
     // if a key is released, we'll send it over to the PlayerBall class for
     // processing
     public void keyReleased(KeyEvent e) {
-        // paddle.keyReleased(e);
+        paddle.keyReleased(e);
     }
 
     // left empty because we don't need it; must be here because it is required to
