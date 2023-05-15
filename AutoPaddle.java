@@ -31,7 +31,7 @@ public class AutoPaddle extends Rectangle {
     // called frequently from the GamePanel class
     // draws the current location of the ball to the screen
     public void draw(Graphics g) {
-        g.setColor(Color.white);
+        g.setColor(Color.black);
         g.fillRect(x, y, PADDLE_THICKNESS, PADDLE_LENGTH);
     }
 

@@ -16,7 +16,7 @@ public class GameFrame extends JFrame {
         this.add(panel);
         this.setTitle("Pong!"); // set title for frame
         this.setResizable(false); // frame can't change size
-        this.setBackground(Color.black);
+        this.setBackground(Color.white);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // X button will stop program execution
         this.pack();// makes components fit in window - don't need to set JFrame size, as it will
                     // adjust accordingly
