@@ -14,7 +14,7 @@ public class Ball extends Rectangle {
     public int yVelocity;
     public int xVelocity;
     public final int SPEED = 5; // movement speed of ball
-    public static final int BALL_DIAMETER = 20; // size of ball
+    public static int BALL_DIAMETER = 20; // size of ball
     private Image image;
 
     // constructor creates ball at given location with given dimensions
@@ -30,8 +30,8 @@ public class Ball extends Rectangle {
     public void reset(int i, int j) {
         double a = Math.random() * 2 * Math.PI / 3;
         double initialHeadingAngle = 7 * Math.PI / 12 + ((a < Math.PI / 3) ? a : (a + Math.PI / 6));
-        xVelocity = (int) (SPEED * Math.cos(initialHeadingAngle));
-        yVelocity = (int) (SPEED * Math.sin(initialHeadingAngle));
+        yVelocity = -(int) (SPEED * Math.cos(initialHeadingAngle));
+        xVelocity = (int) (SPEED * Math.sin(initialHeadingAngle));
         x = i;
         y = j;
     }
@@ -52,14 +52,15 @@ public class Ball extends Rectangle {
     public void move() {
         y = y + yVelocity;
         x = x + xVelocity;
+        BALL_DIAMETER = y / 20 + 20;
     }
 
     // called frequently from the GamePanel class
     // draws the current location of the ball to the screen
     public void draw(Graphics g) {
-        g.drawImage(image, x, y, null);
-        // g.setColor(Color.green);
-        // g.fillOval(x, y, BALL_DIAMETER, BALL_DIAMETER);
+        // g.drawImage(image, x, y, null);
+        g.setColor(Color.green);
+        g.fillOval(x, y, BALL_DIAMETER, BALL_DIAMETER);
     }
 
 }
