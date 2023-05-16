@@ -80,7 +80,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         computerScore.draw(g);
         if (stop) {
             oldFont = g.getFont();
-            newFont = oldFont.deriveFont(oldFont.getSize() * 1.2F);
+            newFont = oldFont.deriveFont(oldFont.getSize());
             g.setFont(newFont);
             endMessage.draw(g);
         }

@@ -24,7 +24,7 @@ public class BigText extends Rectangle {
     // draws the current location of the ball to the screen
     public void draw(Graphics g) {
         g.setColor(Color.black);
-        g.drawString(message, GAME_WIDTH / 10, GAME_HEIGHT / 2);
+        g.drawString(message, GAME_WIDTH / 7, GAME_HEIGHT / 3);
     }
 
 }
