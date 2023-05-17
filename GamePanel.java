@@ -23,22 +23,27 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     public Graphics graphics;
 
     public boolean stop = false;
+    public double incline = 11 * Math.PI / 24;
 
     public Ball ball;
     public Paddle paddle;
     public AutoPaddle paddle2;
     public PlayerScore playerScore;
     public ComputerScore computerScore;
+    public LeftBorder leftBorder;
+    public RightBorder rightBorder;
 
     public BigText endMessage;
 
     public GamePanel() {
-        ball = new Ball(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
+        ball = new Ball(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2, incline);
         paddle = new Paddle(GAME_WIDTH / 2 - Paddle.PADDLE_LENGTH / 2, GAME_HEIGHT - Paddle.PADDLE_THICKNESS);
         paddle2 = new AutoPaddle(GAME_WIDTH / 2 - AutoPaddle.PADDLE_LENGTH / 2, 0);
         playerScore = new PlayerScore(GAME_WIDTH, GAME_HEIGHT);
         computerScore = new ComputerScore(GAME_WIDTH, GAME_HEIGHT);
         endMessage = new BigText(GAME_WIDTH, GAME_HEIGHT);
+        leftBorder = new LeftBorder(GAME_WIDTH, GAME_HEIGHT, incline);
+        rightBorder = new RightBorder(GAME_WIDTH, GAME_HEIGHT, incline);
 
         this.setFocusable(true); // make everything in this class appear on the screen
         this.addKeyListener(this); // start listening for keyboard input
@@ -78,6 +83,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         ball.draw(g);
         playerScore.draw(g);
         computerScore.draw(g);
+        leftBorder.draw(g);
+        rightBorder.draw(g);
         if (stop) {
             oldFont = g.getFont();
             newFont = oldFont.deriveFont(oldFont.getSize());
@@ -108,27 +115,27 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 setWinner("the computer");
 
             // stop player paddle if left or right edges hit
-            if (paddle.x <= 0) {
-                paddle.x = 0;
+            if (paddle.x <= leftBorder.x[1]) {
+                paddle.x = leftBorder.x[1];
             }
-            if (paddle.x >= GAME_WIDTH - Paddle.PADDLE_LENGTH) {
-                paddle.x = GAME_WIDTH - Paddle.PADDLE_LENGTH;
-            }
-
-            // stop auto paddle if left or right edges hit
-            if (paddle2.x <= 0) {
-                paddle2.x = 0;
-            }
-            if (paddle2.x >= GAME_WIDTH - AutoPaddle.PADDLE_LENGTH) {
-                paddle2.x = GAME_WIDTH - AutoPaddle.PADDLE_LENGTH;
+            if (paddle.x >= rightBorder.x[1] - Paddle.PADDLE_LENGTH) {
+                paddle.x = rightBorder.x[1] - Paddle.PADDLE_LENGTH;
             }
 
             // bounce ball if left or right edges hit
-            if (ball.x <= 0) {
-                ball.flipXDirection();
+            if (ball.x <= leftBorder.x[2] - ball.y / Math.tan(incline)) {
+                ball.flipHeading();
             }
-            if (ball.x >= GAME_WIDTH - Ball.BALL_DIAMETER) {
-                ball.flipXDirection();
+            if (ball.x >= rightBorder.x[2] + ball.y / Math.tan(incline) - Ball.BALL_DIAMETER) {
+                ball.flipHeading();
+            }
+
+            // stop auto paddle if left or right edges hit
+            if (paddle2.x <= leftBorder.x[2]) {
+                paddle2.x = leftBorder.x[2];
+            }
+            if (paddle2.x >= rightBorder.x[2] - AutoPaddle.PADDLE_LENGTH) {
+                paddle2.x = rightBorder.x[2] - AutoPaddle.PADDLE_LENGTH;
             }
 
             // bounce if player paddle hit
