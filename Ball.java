@@ -7,7 +7,7 @@ In 2D GUI, basically everything is a rectangle even if it doesn't look like it!
 */
 import java.awt.*;
 
-import javax.swing.ImageIcon;
+// import javax.swing.ImageIcon;
 
 public class Ball extends Rectangle {
 
@@ -15,13 +15,13 @@ public class Ball extends Rectangle {
     public int xVelocity;
     public final int SPEED = 5; // movement speed of ball
     public static int BALL_DIAMETER = 20; // size of ball
-    private Image image;
+    // private Image image;
 
     // constructor creates ball at given location with given dimensions
     public Ball(int x, int y) {
         super(x, y, BALL_DIAMETER, BALL_DIAMETER);
         reset(x, y);
-        image = new ImageIcon("images/cannonball.png").getImage();
+        // image = new ImageIcon("images/cannonball.png").getImage();
     }
 
     // reset ball to middle with random heading angle
@@ -52,7 +52,7 @@ public class Ball extends Rectangle {
     public void move() {
         y = y + yVelocity;
         x = x + xVelocity;
-        BALL_DIAMETER = y / 20 + 20;
+        BALL_DIAMETER = y / 40 + 10;
     }
 
     // called frequently from the GamePanel class
