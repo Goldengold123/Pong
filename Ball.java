@@ -12,17 +12,23 @@ import java.awt.*;
 public class Ball extends Rectangle {
 
     public double incline;
-    public int yVelocity;
-    public int xVelocity;
+    public double theta;
+
+    public double xReal;
+    public double yReal;
+    public double xVelocity;
+    public double yVelocity;
+
     public final int SPEED = 5; // movement speed of ball
     public static int BALL_DIAMETER = 20; // size of ball
-    public double theta;
     // private Image image;
 
     // constructor creates ball at given location with given dimensions
     public Ball(int x, int y, double i) {
         super(x, y, BALL_DIAMETER, BALL_DIAMETER);
         reset(x, y);
+        xReal = x;
+        yReal = y;
         incline = i;
         // image = new ImageIcon("images/cannonball.png").getImage();
     }
@@ -33,8 +39,10 @@ public class Ball extends Rectangle {
     public void reset(int i, int j) {
         theta = 5 * Math.PI / 3;
         // theta = 7 * Math.PI / 6 + Math.random() * 2 * Math.PI / 3;
-        yVelocity = -(int) (SPEED * Math.cos(theta));
-        xVelocity = (int) (SPEED * Math.sin(theta));
+        yVelocity = -(SPEED * Math.cos(theta));
+        xVelocity = (SPEED * Math.sin(theta));
+        xReal = i;
+        yReal = j;
         x = i;
         y = j;
     }
@@ -53,13 +61,17 @@ public class Ball extends Rectangle {
     public void flipHeading() {
         System.out.println(theta + " " + xVelocity + " " + yVelocity);
         if (Math.PI <= theta && theta < 3 * Math.PI / 2) {
-            theta = 2 * Math.PI - (Math.PI - incline) * (theta - Math.PI) / incline;
+            // theta = 2 * Math.PI - (Math.PI - incline) * (theta - Math.PI) / incline;
+            theta = Math.PI + incline - (Math.PI - incline) * (Math.PI + incline - theta) / incline;
         } else if (3 * Math.PI / 2 <= theta && theta < 2 * Math.PI) {
-            theta = Math.PI + (Math.PI - incline) * (2 * Math.PI - theta) / incline;
+            // theta = Math.PI + (Math.PI - incline) * (2 * Math.PI - theta) / incline;
+            theta = 2 * Math.PI - incline - (Math.PI - incline) * (incline + theta - 2 * Math.PI) / incline;
         } else if (Math.PI / 2 <= theta && theta < Math.PI) {
-            theta = incline * (Math.PI - theta) / (Math.PI - incline);
+            // theta = incline * (Math.PI - theta) / (Math.PI - incline);
+            theta = incline - incline * (theta - incline) / (Math.PI - incline);
         } else if (0 <= theta && theta < Math.PI / 2) {
-            theta = Math.PI - incline * (theta) / (Math.PI - incline);
+            // theta = Math.PI - incline * (theta) / (Math.PI - incline);
+            theta = Math.PI - incline + incline * (Math.PI - incline - theta) / (Math.PI - incline);
         } else {
             theta = Math.PI - theta;
         }
@@ -70,11 +82,13 @@ public class Ball extends Rectangle {
     // called frequently from both Ball class and GamePanel class
     // updates the current location of the ball
     public void move() {
-        xVelocity = (int) (SPEED * Math.cos(theta));
-        yVelocity = (int) (SPEED * Math.sin(theta));
-        y = y + yVelocity;
-        x = x + xVelocity;
-        BALL_DIAMETER = y / 40 + 10;
+        xVelocity = SPEED * Math.cos(theta);
+        yVelocity = SPEED * Math.sin(theta);
+        yReal += yVelocity;
+        xReal += xVelocity;
+        y = (int) yReal;
+        x = (int) xReal;
+        BALL_DIAMETER = (int) (yReal / 40 + 10);
     }
 
     // called frequently from the GamePanel class

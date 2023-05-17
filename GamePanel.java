@@ -142,7 +142,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             if (0 <= paddle.y - ball.y && paddle.y - ball.y <= Ball.BALL_DIAMETER
                     && -Ball.BALL_DIAMETER <= ball.x - paddle.x && ball.x - paddle.x <= Paddle.PADDLE_LENGTH) {
                 ball.flipYDirection();
-                ball.y = GAME_HEIGHT - Paddle.PADDLE_THICKNESS - Ball.BALL_DIAMETER;
+                ball.yReal = GAME_HEIGHT - Paddle.PADDLE_THICKNESS - Ball.BALL_DIAMETER;
             }
             // reset ball if bottom edge hit and paddle not hit
             else if (ball.y >= GAME_HEIGHT - Ball.BALL_DIAMETER) {
@@ -155,7 +155,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             if (0 <= ball.y - paddle2.y && ball.y - paddle2.y <= AutoPaddle.PADDLE_THICKNESS
                     && -Ball.BALL_DIAMETER <= ball.x - paddle2.x && ball.x - paddle2.x <= AutoPaddle.PADDLE_LENGTH) {
                 ball.flipYDirection();
-                ball.y = AutoPaddle.PADDLE_THICKNESS;
+                ball.yReal = AutoPaddle.PADDLE_THICKNESS;
             }
 
             // reset ball if right edge hit and paddle not hit
