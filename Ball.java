@@ -31,8 +31,8 @@ public class Ball extends Rectangle {
     // pointed towards the user with a related acute angle greater than pi/12
     // (if it is less than pi/12, the game will be very boring)
     public void reset(int i, int j) {
-        theta = 4.705390833246417;
-        // theta = Math.PI * 7 / 6 + Math.random() * 2 * Math.PI / 3;
+        theta = 5 * Math.PI / 3;
+        // theta = 7 * Math.PI / 6 + Math.random() * 2 * Math.PI / 3;
         yVelocity = -(int) (SPEED * Math.cos(theta));
         xVelocity = (int) (SPEED * Math.sin(theta));
         x = i;
