@@ -11,6 +11,9 @@ import java.awt.*;
 
 public class Ball extends Rectangle {
 
+    private final static double pi1 = 3.141592653; // rounded version to prevent precision errors
+    private final static double pi2 = 3.141592654; // rounded version to prevent precision errors
+
     public double incline;
     public double theta;
 
@@ -60,16 +63,16 @@ public class Ball extends Rectangle {
 
     public void flipHeading() {
         System.out.println(theta + " " + xVelocity + " " + yVelocity);
-        if (Math.PI <= theta && theta < 3 * Math.PI / 2) {
+        if (pi1 <= theta && theta < 3 * pi2 / 2) {
             // theta = 2 * Math.PI - (Math.PI - incline) * (theta - Math.PI) / incline;
             theta = Math.PI + incline - (Math.PI - incline) * (Math.PI + incline - theta) / incline;
-        } else if (3 * Math.PI / 2 <= theta && theta < 2 * Math.PI) {
+        } else if (3 * pi1 / 2 <= theta && theta < 2 * pi2) {
             // theta = Math.PI + (Math.PI - incline) * (2 * Math.PI - theta) / incline;
             theta = 2 * Math.PI - incline - (Math.PI - incline) * (incline + theta - 2 * Math.PI) / incline;
-        } else if (Math.PI / 2 <= theta && theta < Math.PI) {
+        } else if (pi1 / 2 <= theta && theta < pi2) {
             // theta = incline * (Math.PI - theta) / (Math.PI - incline);
             theta = incline - incline * (theta - incline) / (Math.PI - incline);
-        } else if (0 <= theta && theta < Math.PI / 2) {
+        } else if (0 <= theta && theta < pi2 / 2) {
             // theta = Math.PI - incline * (theta) / (Math.PI - incline);
             theta = Math.PI - incline + incline * (Math.PI - incline - theta) / (Math.PI - incline);
         } else {
