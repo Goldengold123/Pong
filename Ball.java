@@ -63,6 +63,16 @@ public class Ball extends Rectangle {
 
     public void flipHeading() {
         System.out.println(theta + " " + xVelocity + " " + yVelocity);
+        if (Math.abs(theta - Math.PI) <= 1e-2) {
+            if (theta > Math.PI)
+                theta = Math.PI / 3;
+            else
+                theta = 5 * Math.PI / 3;
+        } else if (theta <= 1e-2) {
+            theta = 2 * Math.PI / 3;
+        } else if (2 * Math.PI - theta <= 1e-2) {
+            theta = 4 * Math.PI / 3;
+        }
         if (pi1 <= theta && theta < 3 * pi2 / 2) {
             // theta = 2 * Math.PI - (Math.PI - incline) * (theta - Math.PI) / incline;
             theta = Math.PI + incline - (Math.PI - incline) * (Math.PI + incline - theta) / incline;
@@ -75,8 +85,6 @@ public class Ball extends Rectangle {
         } else if (0 <= theta && theta < pi2 / 2) {
             // theta = Math.PI - incline * (theta) / (Math.PI - incline);
             theta = Math.PI - incline + incline * (Math.PI - incline - theta) / (Math.PI - incline);
-        } else {
-            theta = Math.PI - theta;
         }
         System.out.println(theta);
         System.out.println();
@@ -91,7 +99,7 @@ public class Ball extends Rectangle {
         xReal += xVelocity;
         y = (int) yReal;
         x = (int) xReal;
-        BALL_DIAMETER = (int) (yReal / 40 + 10);
+        BALL_DIAMETER = (int) (yReal / 10 + 10);
     }
 
     // called frequently from the GamePanel class
