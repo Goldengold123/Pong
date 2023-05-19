@@ -134,9 +134,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             // bounce if player paddle hit
             if (0 <= ball.x - paddle.x && ball.x - paddle.x <= Paddle.PADDLE_THICKNESS
                     && -Ball.BALL_DIAMETER <= ball.y - paddle.y && ball.y - paddle.y <= Paddle.PADDLE_LENGTH) {
-                ball.flipXDirection();
+                ball.flipDirection(((ball.x - paddle.x) * 1.0 / Paddle.PADDLE_LENGTH));
                 ball.x = Paddle.PADDLE_THICKNESS;
+
             }
+
             // reset ball if left edge hit and paddle not hit
             else if (ball.x <= 0) {
                 ball.reset(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
@@ -146,7 +148,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             // bounce if auto paddle hit
             if (0 <= paddle2.x - ball.x && paddle2.x - ball.x <= Ball.BALL_DIAMETER
                     && -Ball.BALL_DIAMETER <= ball.y - paddle2.y && ball.y - paddle2.y <= AutoPaddle.PADDLE_LENGTH) {
-                ball.flipXDirection();
+                ball.flipDirection(((ball.x - paddle2.x) / 1.0 * AutoPaddle.PADDLE_LENGTH));
                 ball.x = GAME_WIDTH - AutoPaddle.PADDLE_THICKNESS - Ball.BALL_DIAMETER;
             }
             // reset ball if right edge hit and paddle not hit
@@ -155,6 +157,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 playerScore.score++;
             }
         }
+
     }
 
     public void setWinner(String winner) {

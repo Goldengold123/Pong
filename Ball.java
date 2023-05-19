@@ -43,8 +43,11 @@ public class Ball extends Rectangle {
 
     // called whenever the movement of the ball changes in the x-direction
     // (left/right)
-    public void flipXDirection() {
-        xVelocity = -1 * xVelocity;
+    public void flipDirection(double p) {
+        System.out.println(p);
+        xVelocity = (int) (SPEED * Math.sin((5 * Math.PI / 12) * (Math.sin(Math.PI * p) + Math.PI / 12)));
+        yVelocity *= (int) ((SPEED * Math.cos((5 * Math.PI / 12) * (Math.sin(Math.PI * p) + Math.PI / 12))));
+        yVelocity /= SPEED;
     }
 
     // called frequently from both Ball class and GamePanel class
