@@ -15,13 +15,13 @@ public class Ball extends Rectangle {
     public int xVelocity;
     public final int SPEED = 5; // movement speed of ball
     public static final int BALL_DIAMETER = 20; // size of ball
-    private Image image;
+    private Image cannonball;
 
     // constructor creates ball at given location with given dimensions
     public Ball(int x, int y) {
         super(x, y, BALL_DIAMETER, BALL_DIAMETER);
         reset(x, y);
-        image = new ImageIcon("images/cannonball.png").getImage();
+        cannonball = new ImageIcon("images/cannonball.png").getImage();
     }
 
     // reset ball to middle with random heading angle
@@ -57,7 +57,7 @@ public class Ball extends Rectangle {
     // called frequently from the GamePanel class
     // draws the current location of the ball to the screen
     public void draw(Graphics g) {
-        g.drawImage(image, x, y, null);
+        g.drawImage(cannonball, x, y, null);
         // g.setColor(Color.green);
         // g.fillOval(x, y, BALL_DIAMETER, BALL_DIAMETER);
     }

@@ -10,7 +10,7 @@ import java.awt.*;
 public class AutoPaddle extends Rectangle {
 
     public int yVelocity;
-    public final int SPEED = 2;
+    public final int SPEED = 5;
     public static final int PADDLE_LENGTH = 150;
     public static final int PADDLE_THICKNESS = 10;
 
@@ -22,7 +22,7 @@ public class AutoPaddle extends Rectangle {
     // called frequently from both Ball class and GamePanel class
     // updates the current location of the ball
     public void move(Ball b) {
-        yVelocity = ((b.y + Ball.BALL_DIAMETER / 2 == y + AutoPaddle.PADDLE_LENGTH / 2) ? 0
+        yVelocity = ((Math.abs((b.y + Ball.BALL_DIAMETER / 2) - (y + AutoPaddle.PADDLE_LENGTH / 2)) <= SPEED) ? 0
                 : SPEED * (Math.abs(b.y + Ball.BALL_DIAMETER / 2 - y - AutoPaddle.PADDLE_LENGTH / 2)
                         / (b.y + Ball.BALL_DIAMETER / 2 - y - AutoPaddle.PADDLE_LENGTH / 2)));
         y = y + yVelocity;
