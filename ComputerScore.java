@@ -23,8 +23,8 @@ public class ComputerScore extends Rectangle {
     // called frequently from the GamePanel class
     // draws the current location of the ball to the screen
     public void draw(Graphics g) {
-        g.setColor(Color.black);
-        g.drawString("" + score, 3 * GAME_WIDTH / 4, GAME_HEIGHT / 10);
+        g.setColor(Color.white);
+        g.drawString("" + score, GAME_WIDTH / 2, GAME_HEIGHT / 10);
     }
 
 }

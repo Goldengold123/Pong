@@ -15,7 +15,7 @@ import javax.swing.*;
 public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     // dimensions of window
-    public static final int GAME_WIDTH = 500;
+    public static final int GAME_WIDTH = 700;
     public static final int GAME_HEIGHT = 600;
 
     public Thread gameThread;
@@ -34,8 +34,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     public GamePanel() {
         ball = new Ball(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
-        paddle = new Paddle(0, GAME_HEIGHT / 2 - Paddle.PADDLE_LENGTH / 2);
-        paddle2 = new AutoPaddle(GAME_WIDTH - AutoPaddle.PADDLE_THICKNESS, GAME_HEIGHT / 2 - Paddle.PADDLE_LENGTH / 2);
+        paddle = new Paddle(GAME_WIDTH / 2 - Paddle.PADDLE_LENGTH / 2, GAME_HEIGHT - Paddle.PADDLE_THICKNESS);
+        paddle2 = new AutoPaddle(GAME_WIDTH / 2 - AutoPaddle.PADDLE_LENGTH / 2, 0);
         playerScore = new PlayerScore(GAME_WIDTH, GAME_HEIGHT);
         computerScore = new ComputerScore(GAME_WIDTH, GAME_HEIGHT);
         endMessage = new BigText(GAME_WIDTH, GAME_HEIGHT);
@@ -107,50 +107,50 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             else if (computerScore.score >= 10)
                 setWinner("the computer");
 
-            // stop player paddle if top or bottom edges hit
-            if (paddle.y <= 0) {
-                paddle.y = 0;
+            // stop player paddle if left or right edges hit
+            if (paddle.x <= 0) {
+                paddle.x = 0;
             }
-            if (paddle.y >= GAME_HEIGHT - Paddle.PADDLE_LENGTH) {
-                paddle.y = GAME_HEIGHT - Paddle.PADDLE_LENGTH;
-            }
-
-            // stop auto paddle if top or bottom edges hit
-            if (paddle2.y <= 0) {
-                paddle2.y = 0;
-            }
-            if (paddle2.y >= GAME_HEIGHT - AutoPaddle.PADDLE_LENGTH) {
-                paddle2.y = GAME_HEIGHT - AutoPaddle.PADDLE_LENGTH;
+            if (paddle.x >= GAME_WIDTH - Paddle.PADDLE_LENGTH) {
+                paddle.x = GAME_WIDTH - Paddle.PADDLE_LENGTH;
             }
 
-            // bounce ball if top or bottom edges hit
-            if (ball.y <= 0) {
-                ball.flipYDirection();
+            // stop auto paddle if left or right edges hit
+            if (paddle2.x <= 0) {
+                paddle2.x = 0;
             }
-            if (ball.y >= GAME_HEIGHT - Ball.BALL_DIAMETER) {
-                ball.flipYDirection();
+            if (paddle2.x >= GAME_WIDTH - AutoPaddle.PADDLE_LENGTH) {
+                paddle2.x = GAME_WIDTH - AutoPaddle.PADDLE_LENGTH;
+            }
+
+            // bounce ball if left or right edges hit
+            if (ball.x <= 0) {
+                ball.flipXDirection();
+            }
+            if (ball.x >= GAME_WIDTH - Ball.BALL_DIAMETER) {
+                ball.flipXDirection();
             }
 
             // bounce if player paddle hit
-            if (0 <= ball.x - paddle.x && ball.x - paddle.x <= Paddle.PADDLE_THICKNESS
-                    && -Ball.BALL_DIAMETER <= ball.y - paddle.y && ball.y - paddle.y <= Paddle.PADDLE_LENGTH) {
-                ball.flipXDirection();
-                ball.x = Paddle.PADDLE_THICKNESS;
+            if (0 <= paddle.y - ball.y && paddle.y - ball.y <= Ball.BALL_DIAMETER
+                    && -Ball.BALL_DIAMETER <= ball.x - paddle.x && ball.x - paddle.x <= Paddle.PADDLE_LENGTH) {
+                ball.flipYDirection();
+                ball.y = GAME_HEIGHT - Paddle.PADDLE_THICKNESS - Ball.BALL_DIAMETER;
             }
-            // reset ball if left edge hit and paddle not hit
-            else if (ball.x <= 0) {
+            // reset ball if bottom edge hit and paddle not hit
+            else if (ball.y >= GAME_HEIGHT - Ball.BALL_DIAMETER) {
                 ball.reset(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
                 computerScore.score++;
             }
 
             // bounce if auto paddle hit
-            if (0 <= paddle2.x - ball.x && paddle2.x - ball.x <= Ball.BALL_DIAMETER
-                    && -Ball.BALL_DIAMETER <= ball.y - paddle2.y && ball.y - paddle2.y <= AutoPaddle.PADDLE_LENGTH) {
-                ball.flipXDirection();
-                ball.x = GAME_WIDTH - AutoPaddle.PADDLE_THICKNESS - Ball.BALL_DIAMETER;
+            if (0 <= ball.y - paddle2.y && ball.y - paddle2.y <= AutoPaddle.PADDLE_THICKNESS
+                    && -Ball.BALL_DIAMETER <= ball.x - paddle2.x && ball.x - paddle2.x <= AutoPaddle.PADDLE_LENGTH) {
+                ball.flipYDirection();
+                ball.y = AutoPaddle.PADDLE_THICKNESS;
             }
-            // reset ball if right edge hit and paddle not hit
-            else if (ball.x >= GAME_WIDTH - Ball.BALL_DIAMETER) {
+            // reset ball if top edge hit and paddle not hit
+            else if (ball.y <= paddle2.y) {
                 ball.reset(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
                 playerScore.score++;
             }

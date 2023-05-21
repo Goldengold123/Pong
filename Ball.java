@@ -14,14 +14,14 @@ public class Ball extends Rectangle {
     public int yVelocity;
     public int xVelocity;
     public final int SPEED = 5; // movement speed of ball
-    public static final int BALL_DIAMETER = 20; // size of ball
-    private Image cannonball;
+    public static final int BALL_DIAMETER = 40; // size of ball
+    private Image alien;
 
     // constructor creates ball at given location with given dimensions
     public Ball(int x, int y) {
         super(x, y, BALL_DIAMETER, BALL_DIAMETER);
         reset(x, y);
-        cannonball = new ImageIcon("images/cannonball.png").getImage();
+        alien = new ImageIcon("images/alien.png").getImage();
     }
 
     // reset ball to middle with random heading angle
@@ -29,7 +29,7 @@ public class Ball extends Rectangle {
     // (if it is less than pi/12, the game will be very boring)
     public void reset(int i, int j) {
         double a = Math.random() * 2 * Math.PI / 3;
-        double initialHeadingAngle = 7 * Math.PI / 12 + ((a < Math.PI / 3) ? a : (a + Math.PI / 6));
+        double initialHeadingAngle = 13 * Math.PI / 12 + ((a < Math.PI / 3) ? a : (a + Math.PI / 6));
         xVelocity = (int) (SPEED * Math.cos(initialHeadingAngle));
         yVelocity = (int) (SPEED * Math.sin(initialHeadingAngle));
         x = i;
@@ -57,7 +57,7 @@ public class Ball extends Rectangle {
     // called frequently from the GamePanel class
     // draws the current location of the ball to the screen
     public void draw(Graphics g) {
-        g.drawImage(cannonball, x, y, null);
+        g.drawImage(alien, x, y, null);
         // g.setColor(Color.green);
         // g.fillOval(x, y, BALL_DIAMETER, BALL_DIAMETER);
     }
