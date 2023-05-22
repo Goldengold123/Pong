@@ -1,54 +1,69 @@
-
-/* GamePanel class acts as the main "game loop" - continuously runs the game and calls whatever needs to be called
-
+/*
+GamePanel class acts as the main "game loop" - continuously runs the game and calls whatever needs to be called
 Child of JPanel because JPanel contains methods for drawing to the screen
-
 Implements KeyListener interface to listen for keyboard input
-
 Implements Runnable interface to use "threading" - let the game do two things at once
-
 */
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
 public class GamePanel extends JPanel implements Runnable, KeyListener {
 
+    // VARIABLE DECLARATION
+
     // dimensions of window
     public static final int GAME_WIDTH = 700;
     public static final int GAME_HEIGHT = 600;
 
+    // variables for drawing screen
     public Thread gameThread;
     public Image image;
     public Graphics graphics;
 
-    public boolean stop = false;
+    // game state
+    public int gameState;
+    public final int titleState = 0;
+    public final int playState = 1;
+    public final int endState = 2;
 
+    // objects of the game
     public Ball ball;
     public Paddle paddle;
-    public AutoPaddle paddle2;
+    public AutoPaddle npc;
     public PlayerScore playerScore;
     public ComputerScore computerScore;
-
+    public SmallText instructions;
+    public String[] instructionsArr = {
+            "The objective of this game is to prevent the alien from invading your side of the game screen (bottom).",
+            "Everytime the alien hits the bottom or top edges, the opponent gains a point.",
+            "The first to reach 10 points wins!",
+            "The top UFO (yellow) is controlled by the computer.",
+            "The bottom UFO (orange) is controlled by you - use 'a' (left) and 'd' (right).",
+            "Good luck!"
+    };
+    public BigText startMessage;
     public BigText endMessage;
 
     public GamePanel() {
         ball = new Ball(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
         paddle = new Paddle(GAME_WIDTH / 2 - Paddle.PADDLE_LENGTH / 2, GAME_HEIGHT - Paddle.PADDLE_THICKNESS);
-        paddle2 = new AutoPaddle(GAME_WIDTH / 2 - AutoPaddle.PADDLE_LENGTH / 2, 0);
+        npc = new AutoPaddle(GAME_WIDTH / 2 - AutoPaddle.PADDLE_LENGTH / 2, 0);
         playerScore = new PlayerScore(GAME_WIDTH, GAME_HEIGHT);
         computerScore = new ComputerScore(GAME_WIDTH, GAME_HEIGHT);
-        endMessage = new BigText(GAME_WIDTH, GAME_HEIGHT);
+        startMessage = new BigText("WELCOME TO PONG!", GAME_WIDTH / 4, GAME_HEIGHT / 3);
+        endMessage = new BigText(GAME_WIDTH / 7, GAME_HEIGHT / 3);
+        instructions = new SmallText(instructionsArr, GAME_WIDTH / 15, GAME_HEIGHT / 2);
+
+        gameState = 0;
 
         this.setFocusable(true); // make everything in this class appear on the screen
         this.addKeyListener(this); // start listening for keyboard input
 
         this.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
 
-        // make this class run at the same time as other classes (without this each
-        // class would "pause" while another class runs). By using threading we can
-        // remove lag, and also allows us to do features like display timers in real
-        // time!
+        // thread this class
         gameThread = new Thread(this);
         gameThread.start();
     }
@@ -70,19 +85,17 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     // call the draw methods in each class to update positions as things move
     public void draw(Graphics g) {
-        Font oldFont = g.getFont();
-        Font newFont = oldFont.deriveFont(oldFont.getSize() * 2F);
-        g.setFont(newFont);
-        paddle.draw(g);
-        paddle2.draw(g);
-        ball.draw(g);
-        playerScore.draw(g);
-        computerScore.draw(g);
-        if (stop) {
-            oldFont = g.getFont();
-            newFont = oldFont.deriveFont(oldFont.getSize());
-            g.setFont(newFont);
+        if (gameState == titleState) {
+            startMessage.draw(g);
+            instructions.draw(g);
+        } else if (gameState == endState) {
             endMessage.draw(g);
+        } else {
+            paddle.draw(g);
+            npc.draw(g);
+            ball.draw(g);
+            playerScore.draw(g);
+            computerScore.draw(g);
         }
     }
 
@@ -91,20 +104,20 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     // fluid and natural. If we take this out the movements appear sluggish and
     // laggy
     public void move() {
-        if (!stop) {
+        if (gameState == playState) {
             paddle.move();
-            paddle2.move(ball);
+            npc.move(ball);
             ball.move();
         }
     }
 
     // handles all collision detection and responds accordingly
     public void checkCollision() {
-        if (!stop) {
+        if (gameState == playState) {
             // score >= 10 -> stop
-            if (playerScore.score >= 10)
+            if (PlayerScore.score >= 10)
                 setWinner("you");
-            else if (computerScore.score >= 10)
+            else if (ComputerScore.score >= 10)
                 setWinner("the computer");
 
             // stop player paddle if left or right edges hit
@@ -116,11 +129,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             }
 
             // stop auto paddle if left or right edges hit
-            if (paddle2.x <= 0) {
-                paddle2.x = 0;
+            if (npc.x <= 0) {
+                npc.x = 0;
             }
-            if (paddle2.x >= GAME_WIDTH - AutoPaddle.PADDLE_LENGTH) {
-                paddle2.x = GAME_WIDTH - AutoPaddle.PADDLE_LENGTH;
+            if (npc.x >= GAME_WIDTH - AutoPaddle.PADDLE_LENGTH) {
+                npc.x = GAME_WIDTH - AutoPaddle.PADDLE_LENGTH;
             }
 
             // bounce ball if left or right edges hit
@@ -140,25 +153,25 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             // reset ball if bottom edge hit and paddle not hit
             else if (ball.y >= GAME_HEIGHT - Ball.BALL_DIAMETER) {
                 ball.reset(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
-                computerScore.score++;
+                ComputerScore.score++;
             }
 
             // bounce if auto paddle hit
-            if (0 <= ball.y - paddle2.y && ball.y - paddle2.y <= AutoPaddle.PADDLE_THICKNESS
-                    && -Ball.BALL_DIAMETER <= ball.x - paddle2.x && ball.x - paddle2.x <= AutoPaddle.PADDLE_LENGTH) {
+            if (0 <= ball.y - npc.y && ball.y - npc.y <= AutoPaddle.PADDLE_THICKNESS
+                    && -Ball.BALL_DIAMETER <= ball.x - npc.x && ball.x - npc.x <= AutoPaddle.PADDLE_LENGTH) {
                 ball.flipYDirection();
                 ball.y = AutoPaddle.PADDLE_THICKNESS;
             }
             // reset ball if top edge hit and paddle not hit
-            else if (ball.y <= paddle2.y) {
+            else if (ball.y <= npc.y) {
                 ball.reset(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
-                playerScore.score++;
+                PlayerScore.score++;
             }
         }
     }
 
     public void setWinner(String winner) {
-        stop = true;
+        gameState = 2;
         endMessage.message = "Congratuations to " + winner + "!";
     }
 
@@ -192,14 +205,14 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     // if a key is pressed, we'll send it over to the PlayerBall class for
     // processing
     public void keyPressed(KeyEvent e) {
-        if (!stop)
+        if (gameState == playState)
             paddle.keyPressed(e);
     }
 
     // if a key is released, we'll send it over to the PlayerBall class for
     // processing
     public void keyReleased(KeyEvent e) {
-        if (!stop)
+        if (gameState == playState)
             paddle.keyReleased(e);
     }
 

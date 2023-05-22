@@ -5,26 +5,13 @@ child of Rectangle because that makes it easy to draw and check for collision
 
 In 2D GUI, basically everything is a rectangle even if it doesn't look like it!
 */
-import java.awt.*;
 
-public class PlayerScore extends Rectangle {
+public class PlayerScore extends BigText {
 
-  public int score;
-  public static int GAME_WIDTH;
-  public static int GAME_HEIGHT;
+  public static int score = 0;
 
   // constructor creates ball at given location with given dimensions
   public PlayerScore(int w, int h) {
-    score = 0;
-    GAME_WIDTH = w;
-    GAME_HEIGHT = h;
+    super("" + score, w / 2, 9 * h / 10);
   }
-
-  // called frequently from the GamePanel class
-  // draws the current location of the ball to the screen
-  public void draw(Graphics g) {
-    g.setColor(Color.white);
-    g.drawString("" + score, GAME_WIDTH / 2, 9 * GAME_HEIGHT / 10);
-  }
-
 }
