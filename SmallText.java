@@ -9,12 +9,12 @@ import java.awt.*;
 
 public class SmallText extends Rectangle {
 
-    public String[] message;
+    public String message;
     public int x;
     public int y;
 
     // constructor creates ball at given location with given dimensions
-    public SmallText(String[] m, int w, int h) {
+    public SmallText(String m, int w, int h) {
         message = m;
         x = w;
         y = h;
@@ -23,11 +23,19 @@ public class SmallText extends Rectangle {
     // called frequently from the GamePanel class
     // draws the current location of the ball to the screen
     public void draw(Graphics g) {
-        g.setFont(new Font("TimesRoman", Font.PLAIN, 16));
+        String line = "";
+        int cnt = 0;
+        g.setFont(new Font("Verdana", Font.PLAIN, 16));
         g.setColor(Color.white);
-        for (int i = 0; i < message.length; i++) {
-            g.drawString(message[i], x, y + i * 20);
+        for (int i = 0; i < message.length(); i++) {
+            if (line.length() >= 70) {
+                g.drawString(line, x, y + cnt * 20);
+                line = "";
+                cnt++;
+            }
+            line += message.substring(i, i + 1);
         }
+        g.drawString(line, x, y + cnt * 20);
     }
 
 }

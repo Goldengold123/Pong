@@ -29,7 +29,7 @@ public class BigText extends Rectangle {
     // called frequently from the GamePanel class
     // draws the current location of the ball to the screen
     public void draw(Graphics g) {
-        g.setFont(new Font("TimesRoman", Font.PLAIN, 32));
+        g.setFont(new Font("Impact", Font.PLAIN, 32));
         g.setColor(Color.white);
         g.drawString(message, x, y);
     }

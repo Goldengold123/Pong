@@ -28,22 +28,16 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     public final int playState = 1;
     public final int endState = 2;
 
+    // menu command
+    public int cmd = 0;
+
     // objects of the game
     public Ball ball;
     public Paddle paddle;
     public AutoPaddle npc;
     public PlayerScore playerScore;
     public ComputerScore computerScore;
-    public SmallText instructions;
-    public String[] instructionsArr = {
-            "The objective of this game is to prevent the alien from invading your side of the game screen (bottom).",
-            "Everytime the alien hits the bottom or top edges, the opponent gains a point.",
-            "The first to reach 10 points wins!",
-            "The top UFO (yellow) is controlled by the computer.",
-            "The bottom UFO (orange) is controlled by you - use 'a' (left) and 'd' (right).",
-            "Good luck!"
-    };
-    public BigText startMessage;
+    public JButton start = new JButton("Start!");
     public BigText endMessage;
 
     public GamePanel() {
@@ -52,9 +46,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         npc = new AutoPaddle(GAME_WIDTH / 2 - AutoPaddle.PADDLE_LENGTH / 2, 0);
         playerScore = new PlayerScore(GAME_WIDTH, GAME_HEIGHT);
         computerScore = new ComputerScore(GAME_WIDTH, GAME_HEIGHT);
-        startMessage = new BigText("WELCOME TO PONG!", GAME_WIDTH / 4, GAME_HEIGHT / 3);
         endMessage = new BigText(GAME_WIDTH / 7, GAME_HEIGHT / 3);
-        instructions = new SmallText(instructionsArr, GAME_WIDTH / 15, GAME_HEIGHT / 2);
 
         gameState = 0;
 
@@ -83,19 +75,72 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     }
 
+    public void drawTitle(Graphics g) {
+        int x, y;
+        // title
+        g.setFont(new Font("Impact", Font.PLAIN, 32));
+        x = 5 + GAME_WIDTH / 3;
+        y = 5 + GAME_HEIGHT / 4;
+        g.setColor(Color.gray);
+        g.drawString("WELCOME TO PONG!", x, y);
+        x -= 5;
+        y -= 5;
+        g.setColor(Color.white);
+        g.drawString("WELCOME TO PONG!", x, y);
+
+        // instructions
+        x = GAME_WIDTH / 15;
+        y = GAME_HEIGHT / 3;
+        g.setFont(new Font("Verdana", Font.PLAIN, 16));
+        g.drawString("The objective of this game is to prevent the alien from invading your", x, y);
+        y += 20;
+        g.drawString("side of the game screen (bottom). Everytime the alien hits the bottom", x, y);
+        y += 20;
+        g.drawString("or top edges, the opponent gains a point. The first to 10 points wins!", x, y);
+        y += 20;
+        g.drawString("The top UFO (yellow) is controlled by the computer. The bottom UFO", x, y);
+        y += 20;
+        g.drawString("(orange) is controlled by you: use 'a' (left) and 'd' (right).", x, y);
+        x = 11 * GAME_WIDTH / 24;
+        y += 40;
+        g.drawString("Good luck!", x, y);
+
+        // options
+        y = 2 * GAME_HEIGHT / 3;
+        g.setFont(new Font("Verdana", Font.PLAIN, 24));
+        g.drawString("START", x, y);
+        if (cmd == 0)
+            g.drawString(">", x - 30, y);
+        x = 45 * GAME_WIDTH / 96;
+        y += 50;
+        g.drawString("QUIT", x, y);
+        if (cmd == 1)
+            g.drawString(">", x - 30, y);
+    }
+
+    public void drawGame(Graphics g) {
+        paddle.draw(g);
+        npc.draw(g);
+        ball.draw(g);
+        playerScore.draw(g);
+        computerScore.draw(g);
+    }
+
+    public void drawEnd(Graphics g) {
+        endMessage.draw(g);
+    }
+
     // call the draw methods in each class to update positions as things move
     public void draw(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+        g.setColor(Color.white);
         if (gameState == titleState) {
-            startMessage.draw(g);
-            instructions.draw(g);
+            drawTitle(g);
         } else if (gameState == endState) {
-            endMessage.draw(g);
+            drawGame(g);
         } else {
-            paddle.draw(g);
-            npc.draw(g);
-            ball.draw(g);
-            playerScore.draw(g);
-            computerScore.draw(g);
+            drawEnd(g);
         }
     }
 
@@ -205,6 +250,18 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     // if a key is pressed, we'll send it over to the PlayerBall class for
     // processing
     public void keyPressed(KeyEvent e) {
+        if (gameState == titleState) {
+            if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_UP) {
+                cmd = 0;
+            } else if (e.getKeyCode() == KeyEvent.VK_S || e.getKeyCode() == KeyEvent.VK_DOWN) {
+                cmd = 1;
+            } else if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_SPACE) {
+                if (cmd == 0)
+                    gameState = playState;
+                else if (cmd == 1)
+                    System.exit(0);
+            }
+        }
         if (gameState == playState)
             paddle.keyPressed(e);
     }

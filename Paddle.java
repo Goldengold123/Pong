@@ -34,11 +34,11 @@ public class Paddle extends Rectangle {
     // if the keyboard input isn't any of the options (d, a, w, s), then nothing
     // happens
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyChar() == 'a') {
+        if (e.getKeyChar() == 'a' || e.getKeyChar() == KeyEvent.VK_LEFT) {
             setXDirection(-SPEED);
             move();
         }
-        if (e.getKeyChar() == 'd') {
+        if (e.getKeyChar() == 'd' || e.getKeyChar() == KeyEvent.VK_RIGHT) {
             setXDirection(SPEED);
             move();
         }
