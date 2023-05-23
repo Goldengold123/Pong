@@ -57,7 +57,7 @@ public class Paddle extends Rectangle {
         }
 
         // if d or right arrow released
-        if (e.getKeyChar() == KeyEvent.VK_D || e.getKeyChar() == KeyEvent.VK_RIGHT) {
+        if (e.getKeyCode() == KeyEvent.VK_D || e.getKeyCode() == KeyEvent.VK_RIGHT) {
             setXDirection(0);
             move();
         }

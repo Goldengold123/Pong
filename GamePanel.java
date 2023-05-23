@@ -33,7 +33,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     public final int endState = 2;
 
     // menu command
-    public int cmd = 0;
+    public int cmd;
 
     // objects of the game
     public Ball ball;
@@ -51,6 +51,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         npc = new AutoPaddle(GAME_WIDTH / 2 - AutoPaddle.PADDLE_LENGTH / 2, 0);
 
         gameState = 0; // set game state to title screen
+        cmd = 0; // set menu item to top
 
         this.setFocusable(true); // make everything in this class appear on the screen
         this.addKeyListener(this); // start listening for keyboard input
@@ -217,10 +218,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     public void checkCollision() {
         // only applies to the objects when gameState is playState
         if (gameState == playState) {
-            if (playerScore >= 10) // playerScore >= 10 -> player wins
+            if (playerScore >= 10) {// playerScore >= 10 -> player wins
                 gameState = 2;
-            else if (computerScore >= 10) // computerScore >= 10 -> player loses
+                cmd = 0;
+            } else if (computerScore >= 10) {// computerScore >= 10 -> player loses
                 gameState = -2;
+                cmd = 0;
+            }
 
             // stop player paddle if left or right edges hit
             if (paddle.x <= 0) {
@@ -323,18 +327,25 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             } else if (e.getKeyCode() == KeyEvent.VK_S || e.getKeyCode() == KeyEvent.VK_DOWN) { // bottom menu item
                 cmd = 1;
             } else if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_SPACE) { // apply menu item
-                if (cmd == 0) // restart game
+                if (cmd == 0) {// restart game
+                    playerScore = 0;
+                    computerScore = 0;
+                    ball.reset(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
+                    paddle.x = GAME_WIDTH / 2 - Paddle.PADDLE_LENGTH / 2;
+                    paddle.y = GAME_HEIGHT - Paddle.PADDLE_THICKNESS;
+                    npc.x = GAME_WIDTH / 2 - AutoPaddle.PADDLE_LENGTH / 2;
+                    npc.y = 0;
                     gameState = playState;
-                else if (cmd == 1) // quit
+                } else if (cmd == 1) // quit
                     System.exit(0);
             }
         }
 
-        // // CHEAT KEYS FOR TESTING PURPOSES
-        // if (e.getKeyCode() == KeyEvent.VK_8)
-        // gameState = 2;
-        // if (e.getKeyCode() == KeyEvent.VK_9)
-        // gameState = -2;
+        // CHEAT KEYS FOR TESTING PURPOSES
+        if (e.getKeyCode() == KeyEvent.VK_8)
+            gameState = 2;
+        if (e.getKeyCode() == KeyEvent.VK_9)
+            gameState = -2;
     }
 
     // manage key release
