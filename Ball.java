@@ -28,7 +28,8 @@ public class Ball extends Rectangle {
     // pointed towards the user with a related acute angle greater than pi/12
     // (if it is less than pi/12, the game will be very slow and boring)
     public void reset(int i, int j) {
-        double initialHeadingAngle = 13 * Math.PI / 12 + Math.random() * 5 * Math.PI / 6;
+        double a = Math.random() * 2 * Math.PI / 3;
+        double initialHeadingAngle = Math.PI / 12 + ((a < Math.PI / 3) ? a : (a + Math.PI / 6));
 
         // set x and y velocities using trigonometry
         xVelocity = (int) (SPEED * Math.cos(initialHeadingAngle));
@@ -43,6 +44,9 @@ public class Ball extends Rectangle {
     // called when vertical direction of ball should be flipped (paddle hit)
     public void flipYDirection() {
         yVelocity = -1 * yVelocity;
+        do {
+            xVelocity += Math.random() * 5 - 2; // slight randomness to x direction
+        } while (Math.abs(xVelocity) <= 1);
     }
 
     // called when horizontal direction of ball should be flipped (left/right hit)
