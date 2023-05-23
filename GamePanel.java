@@ -328,13 +328,16 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 cmd = 1;
             } else if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_SPACE) { // apply menu item
                 if (cmd == 0) {// restart game
+                    // reset scores to 0
                     playerScore = 0;
                     computerScore = 0;
+                    // reset positions of objects
                     ball.reset(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
                     paddle.x = GAME_WIDTH / 2 - Paddle.PADDLE_LENGTH / 2;
                     paddle.y = GAME_HEIGHT - Paddle.PADDLE_THICKNESS;
                     npc.x = GAME_WIDTH / 2 - AutoPaddle.PADDLE_LENGTH / 2;
                     npc.y = 0;
+                    // set game state to play state
                     gameState = playState;
                 } else if (cmd == 1) // quit
                     System.exit(0);
