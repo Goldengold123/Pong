@@ -1,49 +1,48 @@
+/*
+ * Author: Grace Pu
+ * Date: May 21
+ * 
+ * Description: 
+ * AutoPaddle class defines behaviours for the computer-controlled paddle
+ * Child of Rectangle to draw and check collisions easily
+ */
 
-/* Ball class defines behaviours for the ball  
-
-child of Rectangle because that makes it easy to draw and check for collision
-
-In 2D GUI, basically everything is a rectangle even if it doesn't look like it!
-*/
 import java.awt.*;
-
 import javax.swing.ImageIcon;
 
 public class AutoPaddle extends Rectangle {
-
-    public int xVelocity;
-    public final int SPEED = 5;
-    public static final int PADDLE_LENGTH = 100;
-    public static final int PADDLE_THICKNESS = 20;
+    private int xVelocity; // velocity of autopaddle
+    private final int SPEED = 5; // movement speed of autopaddle
+    public static final int PADDLE_LENGTH = 100; // length of autopaddle
+    public static final int PADDLE_THICKNESS = 20; // thickness of autopaddle
     private Image ufo;
 
-    // constructor creates ball at given location with given dimensions
+    // constructor creates autopaddle at given location with given dimensions
     public AutoPaddle(int x, int y) {
         super(x, y, PADDLE_THICKNESS, PADDLE_LENGTH);
         ufo = new ImageIcon("images/ufo2.png").getImage();
     }
 
-    // called frequently from both Ball class and GamePanel class
-    // updates the current location of the ball
+    // updates the location of the autopaddle
+    // if ball on left of paddle, move left; if ball on right of paddle, move right
     public void move(Ball b) {
-        // yVelocity = ((Math.abs((b.y + Ball.BALL_DIAMETER / 2) - (y +
-        // AutoPaddle.PADDLE_LENGTH / 2)) <= SPEED) ? 0
-        // : SPEED * (Math.abs(b.y + Ball.BALL_DIAMETER / 2 - y -
-        // AutoPaddle.PADDLE_LENGTH / 2)
-        // / (b.y + Ball.BALL_DIAMETER / 2 - y - AutoPaddle.PADDLE_LENGTH / 2)));
-        // y = y + yVelocity;
-        xVelocity = ((b.x + Ball.BALL_DIAMETER / 2 == x + AutoPaddle.PADDLE_LENGTH / 2) ? 0
-                : SPEED * (Math.abs(b.x + Ball.BALL_DIAMETER / 2 - x - AutoPaddle.PADDLE_LENGTH / 2)
-                        / (b.x + Ball.BALL_DIAMETER / 2 - x - AutoPaddle.PADDLE_LENGTH / 2)));
-        x = x + xVelocity;
+        // if paddle right under ball, don't move
+        if (b.x + Ball.BALL_DIAMETER / 2 == x + AutoPaddle.PADDLE_LENGTH / 2)
+            // needed to prevent division by 0
+            xVelocity = 0;
+        // otherwise use math to determine which direction to set xVelocity to
+        else
+            // the long math expression after "SPEED * " determines the sign of xVelocity
+            // by dividing absolute value and actual value
+            // of the difference between ball center and autopaddle center
+            xVelocity = SPEED * (Math.abs(b.x + Ball.BALL_DIAMETER / 2 - x - AutoPaddle.PADDLE_LENGTH / 2)
+                    / (b.x + Ball.BALL_DIAMETER / 2 - x - AutoPaddle.PADDLE_LENGTH / 2));
+
+        x = x + xVelocity; // only x position needs to be updated b/c y position is constant
     }
 
-    // called frequently from the GamePanel class
-    // draws the current location of the ball to the screen
+    // draws autopaddle to the screen at current location (x,y)
     public void draw(Graphics g) {
-        // g.setColor(Color.black);
         g.drawImage(ufo, x, y, null);
-        // g.fillRect(x, y, PADDLE_LENGTH, PADDLE_THICKNESS);
     }
-
 }

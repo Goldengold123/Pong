@@ -1,9 +1,13 @@
 /*
-GamePanel class acts as the main "game loop" - continuously runs the game and calls whatever needs to be called
-Child of JPanel because JPanel contains methods for drawing to the screen
-Implements KeyListener interface to listen for keyboard input
-Implements Runnable interface to use "threading" - let the game do two things at once
-*/
+ * Author: Grace Pu
+ * Date: May 21
+ * 
+ * Description: 
+ * GamePanel class runs the game and controls some of the events (e.g. game loop)
+ * Child of JPanel because JPanel contains methods for drawing to the screen
+ * Implements Runnable interface to use threading
+ * Implements KeyListener interface to listen for keyboard input
+ */
 
 import java.awt.*;
 import java.awt.event.*;
@@ -57,14 +61,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         gameThread.start();
     }
 
-    // paint is a method in java.awt library that we are overriding. It is a special
-    // method - it is called automatically in the background in order to update what
-    // appears in the window. You NEVER call paint() yourself
+    // Override paint method in java.awt library
+    @Override
     public void paint(Graphics g) {
-        // we are using "double buffering here" - if we draw images directly onto the
-        // screen, it takes time and the human eye can actually notice flashes of lag as
-        // each pixel on the screen is drawn one at a time. Instead, we are going to
-        // draw images OFF the screen, then simply move the image on screen as needed.
+        // use double buffering
         image = createImage(GAME_WIDTH, GAME_HEIGHT); // draw off screen
         graphics = image.getGraphics();
         draw(graphics);// update the positions of everything on the screen
@@ -72,25 +72,30 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     }
 
-    // method to draw title screen, separate from draw method for organization
+    // method to draw title screen
+    // separated from general draw method for organization
     public void drawTitle(Graphics g) {
-        int x, y;
+        int x, y; // use variables to indicate position to draw text -> cleaner code
 
-        // title
+        // title text
         g.setFont(new Font("Impact", Font.PLAIN, 32));
+
+        // title shadow for text effect
         x = 5 + GAME_WIDTH / 3;
         y = 5 + GAME_HEIGHT / 4;
         g.setColor(Color.gray);
         g.drawString("WELCOME TO PONG!", x, y);
+
+        // actual title
         x -= 5;
         y -= 5;
         g.setColor(Color.white);
         g.drawString("WELCOME TO PONG!", x, y);
 
-        // instructions
+        // instructions + good luck text
+        g.setFont(new Font("Verdana", Font.PLAIN, 16));
         x = GAME_WIDTH / 15;
         y = GAME_HEIGHT / 3;
-        g.setFont(new Font("Verdana", Font.PLAIN, 16));
         g.drawString("The objective of this game is to prevent the alien from invading your", x, y);
         y += 20;
         g.drawString("side of the game screen (bottom). Everytime the alien hits the bottom", x, y);
@@ -104,81 +109,103 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         y += 40;
         g.drawString("Good luck!", x, y);
 
-        // menu
-        y = 2 * GAME_HEIGHT / 3;
+        // menu text
         g.setFont(new Font("Verdana", Font.PLAIN, 24));
+
+        // START menu item
+        y = 2 * GAME_HEIGHT / 3;
         g.drawString("START", x, y);
-        if (cmd == 0)
+        if (cmd == 0) // if START menu item highlighted, draw ">"
             g.drawString(">", x - 30, y);
+
+        // QUIT menu item
         x = 45 * GAME_WIDTH / 96;
         y += 50;
         g.drawString("QUIT", x, y);
-        if (cmd == 1)
+        if (cmd == 1) // if QUIT menu item highlighted, draw ">"
             g.drawString(">", x - 30, y);
     }
 
+    // method to draw game screen
+    // separated from general draw method for organization
     public void drawGame(Graphics g) {
-        int x, y;
+        int x, y; // use variables to indicate position to draw text -> cleaner code
+
         paddle.draw(g);
         npc.draw(g);
         ball.draw(g);
+
+        // draw score text
         g.setFont(new Font("Impact", Font.PLAIN, 32));
+
+        // player score
         x = GAME_WIDTH / 2;
         y = 9 * GAME_HEIGHT / 10;
         g.drawString("" + playerScore, x, y);
+
+        // computer score
         x = GAME_WIDTH / 2;
         y = GAME_HEIGHT / 10;
         g.drawString("" + computerScore, x, y);
     }
 
+    // method to draw end screen
+    // separated from general draw method for organization
     public void drawEnd(Graphics g) {
-        int x, y;
+        int x, y; // use variables to indicate position to draw text -> cleaner code
 
-        // win/lose message
+        // win or lose message
         g.setFont(new Font("Impact", Font.PLAIN, 32));
         y = GAME_HEIGHT / 3;
-        if (gameState == 2) {
+
+        if (gameState == 2) { // player won
             x = GAME_WIDTH / 4;
             g.drawString("Congratulations! You won!", x, y);
 
-        } else if (gameState == -2) {
+        } else if (gameState == -2) { // player lost
             x = 3 * GAME_WIDTH / 8;
             g.drawString("Oops... You lost.", x, y);
         }
 
-        // menu
+        // menu text
+        g.setFont(new Font("Verdana", Font.PLAIN, 24));
+
+        // PLAY AGAIN menu item
         x = 10 * GAME_WIDTH / 24;
         y = 2 * GAME_HEIGHT / 3;
-        g.setFont(new Font("Verdana", Font.PLAIN, 24));
         g.drawString("PLAY AGAIN", x, y);
-        if (cmd == 0)
+        if (cmd == 0) // if PLAY AGAIN menu item highlighted, draw ">"
             g.drawString(">", x - 30, y);
+
+        // QUIT menu item
         x = 45 * GAME_WIDTH / 96;
         y += 50;
         g.drawString("QUIT", x, y);
-        if (cmd == 1)
+        if (cmd == 1) // if QUIT menu item highlighted, draw ">"
             g.drawString(">", x - 30, y);
     }
 
     // call the draw methods in each class to update positions as things move
     public void draw(Graphics g) {
+        // antialiasing text so it appears smoother
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-        g.setColor(Color.white);
-        if (gameState == titleState) {
+
+        g.setColor(Color.white); // set color to white
+
+        if (gameState == titleState) { // title state -> draw title screen
             drawTitle(g);
-        } else if (gameState == playState) {
+        } else if (gameState == playState) { // play state -> draw game screen
             drawGame(g);
-        } else if (Math.abs(gameState) == endState) {
+        } else if (Math.abs(gameState) == endState) { // end state -> draw end screen
             drawEnd(g);
         }
     }
 
-    // call the move methods in other classes to update positions
-    // this method is constantly called from run(). By doing this, movements appear
-    // fluid and natural. If we take this out the movements appear sluggish and
-    // laggy
+    // calls move methods in other classes to update positions of objects
+    // constantly called from run() -> fluid and more natural movement
     public void move() {
+        // only applies to the objects when gameState is playState
         if (gameState == playState) {
             paddle.move();
             npc.move(ball);
@@ -188,11 +215,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     // handles all collision detection and responds accordingly
     public void checkCollision() {
+        // only applies to the objects when gameState is playState
         if (gameState == playState) {
-            // score >= 10 -> stop
-            if (playerScore >= 10)
+            if (playerScore >= 10) // playerScore >= 10 -> player wins
                 gameState = 2;
-            else if (computerScore >= 10)
+            else if (computerScore >= 10) // computerScore >= 10 -> player loses
                 gameState = -2;
 
             // stop player paddle if left or right edges hit
@@ -203,7 +230,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 paddle.x = GAME_WIDTH - Paddle.PADDLE_LENGTH;
             }
 
-            // stop auto paddle if left or right edges hit
+            // stop autopaddle if left or right edges hit
             if (npc.x <= 0) {
                 npc.x = 0;
             }
@@ -225,19 +252,19 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 ball.flipYDirection();
                 ball.y = GAME_HEIGHT - Paddle.PADDLE_THICKNESS - Ball.BALL_DIAMETER;
             }
-            // reset ball if bottom edge hit and paddle not hit
+            // reset ball and increase computer score if bottom edge hit and paddle not hit
             else if (ball.y >= GAME_HEIGHT - Ball.BALL_DIAMETER) {
                 ball.reset(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
                 computerScore++;
             }
 
-            // bounce if auto paddle hit
+            // bounce if autopaddle hit
             if (0 <= ball.y - npc.y && ball.y - npc.y <= AutoPaddle.PADDLE_THICKNESS
                     && -Ball.BALL_DIAMETER <= ball.x - npc.x && ball.x - npc.x <= AutoPaddle.PADDLE_LENGTH) {
                 ball.flipYDirection();
                 ball.y = AutoPaddle.PADDLE_THICKNESS;
             }
-            // reset ball if top edge hit and paddle not hit
+            // reset ball and increase player score if top edge hit and autopaddle not hit
             else if (ball.y <= npc.y) {
                 ball.reset(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
                 playerScore++;
@@ -245,19 +272,17 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         }
     }
 
-    // run() method is what makes the game continue running without end. It calls
-    // other methods to move objects, check for collision, and update the screen
+    // run method keeps game running
+    // call methods to move objects, check collision, update screen
     public void run() {
-        // the CPU runs our game code too quickly - we need to slow it down! The
-        // following lines of code "force" the computer to get stuck in a loop for short
-        // intervals between calling other methods to update the screen.
+        // tick speed
         long lastTime = System.nanoTime();
-        double amountOfTicks = 60;
+        double amountOfTicks = 60; // tick speed is 60
         double ns = 1000000000 / amountOfTicks;
         double delta = 0;
         long now;
 
-        while (true) { // this is the infinite game loop
+        while (true) { // infinite game loop
             now = System.nanoTime();
             delta = delta + (now - lastTime) / ns;
             lastTime = now;
@@ -272,51 +297,57 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         }
     }
 
-    // if a key is pressed, we'll send it over to the PlayerBall class for
-    // processing
+    // manage key pressed
+    @Override
     public void keyPressed(KeyEvent e) {
+        // title state -> move menu item cursor
         if (gameState == titleState) {
-            if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_UP) {
+            if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_UP) { // top menu item
                 cmd = 0;
-            } else if (e.getKeyCode() == KeyEvent.VK_S || e.getKeyCode() == KeyEvent.VK_DOWN) {
+            } else if (e.getKeyCode() == KeyEvent.VK_S || e.getKeyCode() == KeyEvent.VK_DOWN) { // bottom menu item
                 cmd = 1;
-            } else if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_SPACE) {
-                if (cmd == 0)
+            } else if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_SPACE) { // apply menu item
+                if (cmd == 0) // start game
                     gameState = playState;
-                else if (cmd == 1)
+                else if (cmd == 1) // quit
                     System.exit(0);
             }
-        } else if (gameState == playState)
+        }
+        // play state -> send key pressed to Paddle class to manage
+        else if (gameState == playState)
             paddle.keyPressed(e);
+        // end state -> move menu item cursor
         else if (Math.abs(gameState) == endState) {
-            if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_UP) {
+            if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_UP) { // top menu item
                 cmd = 0;
-            } else if (e.getKeyCode() == KeyEvent.VK_S || e.getKeyCode() == KeyEvent.VK_DOWN) {
+            } else if (e.getKeyCode() == KeyEvent.VK_S || e.getKeyCode() == KeyEvent.VK_DOWN) { // bottom menu item
                 cmd = 1;
-            } else if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_SPACE) {
-                if (cmd == 0)
+            } else if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_SPACE) { // apply menu item
+                if (cmd == 0) // restart game
                     gameState = playState;
-                else if (cmd == 1)
+                else if (cmd == 1) // quit
                     System.exit(0);
             }
         }
 
-        if (e.getKeyCode() == KeyEvent.VK_8)
-            gameState = 2;
-        if (e.getKeyCode() == KeyEvent.VK_9)
-            gameState = -2;
+        // // CHEAT KEYS FOR TESTING PURPOSES
+        // if (e.getKeyCode() == KeyEvent.VK_8)
+        // gameState = 2;
+        // if (e.getKeyCode() == KeyEvent.VK_9)
+        // gameState = -2;
     }
 
-    // if a key is released, we'll send it over to the PlayerBall class for
-    // processing
+    // manage key release
+    @Override
     public void keyReleased(KeyEvent e) {
+        // if play state, send key released to Paddle class to manage
         if (gameState == playState)
             paddle.keyReleased(e);
     }
 
-    // left empty because we don't need it; must be here because it is required to
-    // be overridded by the KeyListener interface
+    // empty b/c not used
+    // must be here to be overrided by KeyListener interface
+    @Override
     public void keyTyped(KeyEvent e) {
-
     }
 }

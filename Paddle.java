@@ -1,43 +1,46 @@
+/*
+ * Author: Grace Pu
+ * Date: May 21
+ * 
+ * Description: 
+ * Paddle class defines behaviours for the paddle
+ * Child of Rectangle to draw and check collisions easily
+ */
 
-/* Ball class defines behaviours for the ball  
-
-child of Rectangle because that makes it easy to draw and check for collision
-
-In 2D GUI, basically everything is a rectangle even if it doesn't look like it!
-*/
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
 import javax.swing.ImageIcon;
 
 public class Paddle extends Rectangle {
-
-    public int xVelocity;
-    public final int SPEED = 5;
-    public static final int PADDLE_LENGTH = 100;
-    public static final int PADDLE_THICKNESS = 20;
+    private int xVelocity; // velocity of paddle
+    private final int SPEED = 5; // movement speed of paddle
+    public static final int PADDLE_LENGTH = 100; // length of paddle
+    public static final int PADDLE_THICKNESS = 20; // thickness of paddle
     private Image ufo;
 
-    // constructor creates ball at given location with given dimensions
+    // constructor creates paddle at given location with given dimensions
     public Paddle(int x, int y) {
         super(x, y, PADDLE_THICKNESS, PADDLE_LENGTH);
         ufo = new ImageIcon("images/ufo.png").getImage();
     }
 
-    // called whenever the movement of the ball changes in the y-direction (up/down)
-    public void setXDirection(int xDirection) {
+    // called whenever the movement of the paddle changes in horizontal direction
+    private void setXDirection(int xDirection) {
         xVelocity = xDirection;
     }
 
     // called from GamePanel when any keyboard input is detected
-    // updates the direction of the ball based on user input
-    // if the keyboard input isn't any of the options (d, a, w, s), then nothing
-    // happens
+    // updates the direction of the paddle based on user input
+    // if the keyboard input isn't any of the options, then nothing happens
     public void keyPressed(KeyEvent e) {
+        // if a or left arrow pressed, move left
         if (e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_LEFT) {
             setXDirection(-SPEED);
             move();
         }
+
+        // if d or right arrow pressed, move right
         if (e.getKeyCode() == KeyEvent.VK_D || e.getKeyCode() == KeyEvent.VK_RIGHT) {
             setXDirection(SPEED);
             move();
@@ -45,30 +48,28 @@ public class Paddle extends Rectangle {
     }
 
     // called from GamePanel when any key is released (no longer being pressed down)
-    // Makes the ball stop moving in that direction
+    // Makes the paddle stop moving in that direction
     public void keyReleased(KeyEvent e) {
+        // if a or left arrow released
         if (e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_LEFT) {
             setXDirection(0);
             move();
         }
+
+        // if d or right arrow released
         if (e.getKeyChar() == KeyEvent.VK_D || e.getKeyChar() == KeyEvent.VK_RIGHT) {
             setXDirection(0);
             move();
         }
     }
 
-    // called frequently from both Ball class and GamePanel class
-    // updates the current location of the ball
+    // updates the location of the paddle
     public void move() {
-        x = x + xVelocity;
+        x = x + xVelocity; // only x position needs to be updated b/c y position constant
     }
 
-    // called frequently from the GamePanel class
-    // draws the current location of the ball to the screen
+    // draws paddle to the screen at current location (x,y)
     public void draw(Graphics g) {
-        // g.setColor(Color.black);
         g.drawImage(ufo, x, y, null);
-        // g.fillRect(x, y, PADDLE_THICKNESS, PADDLE_LENGTH);
     }
-
 }
