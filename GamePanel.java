@@ -35,25 +35,22 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     public Ball ball;
     public Paddle paddle;
     public AutoPaddle npc;
-    public PlayerScore playerScore;
-    public ComputerScore computerScore;
-    public JButton start = new JButton("Start!");
-    public BigText endMessage;
 
+    // scores
+    public int playerScore = 0;
+    public int computerScore = 0;
+
+    // constructor - initialize game objects
     public GamePanel() {
         ball = new Ball(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
         paddle = new Paddle(GAME_WIDTH / 2 - Paddle.PADDLE_LENGTH / 2, GAME_HEIGHT - Paddle.PADDLE_THICKNESS);
         npc = new AutoPaddle(GAME_WIDTH / 2 - AutoPaddle.PADDLE_LENGTH / 2, 0);
-        playerScore = new PlayerScore(GAME_WIDTH, GAME_HEIGHT);
-        computerScore = new ComputerScore(GAME_WIDTH, GAME_HEIGHT);
-        endMessage = new BigText(GAME_WIDTH / 7, GAME_HEIGHT / 3);
 
-        gameState = 0;
+        gameState = 0; // set game state to title screen
 
         this.setFocusable(true); // make everything in this class appear on the screen
         this.addKeyListener(this); // start listening for keyboard input
-
-        this.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
+        this.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT)); // preferred window size
 
         // thread this class
         gameThread = new Thread(this);
@@ -75,8 +72,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     }
 
+    // method to draw title screen, separate from draw method for organization
     public void drawTitle(Graphics g) {
         int x, y;
+
         // title
         g.setFont(new Font("Impact", Font.PLAIN, 32));
         x = 5 + GAME_WIDTH / 3;
@@ -105,7 +104,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         y += 40;
         g.drawString("Good luck!", x, y);
 
-        // options
+        // menu
         y = 2 * GAME_HEIGHT / 3;
         g.setFont(new Font("Verdana", Font.PLAIN, 24));
         g.drawString("START", x, y);
@@ -119,15 +118,46 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     public void drawGame(Graphics g) {
+        int x, y;
         paddle.draw(g);
         npc.draw(g);
         ball.draw(g);
-        playerScore.draw(g);
-        computerScore.draw(g);
+        g.setFont(new Font("Impact", Font.PLAIN, 32));
+        x = GAME_WIDTH / 2;
+        y = 9 * GAME_HEIGHT / 10;
+        g.drawString("" + playerScore, x, y);
+        x = GAME_WIDTH / 2;
+        y = GAME_HEIGHT / 10;
+        g.drawString("" + computerScore, x, y);
     }
 
     public void drawEnd(Graphics g) {
-        endMessage.draw(g);
+        int x, y;
+
+        // win/lose message
+        g.setFont(new Font("Impact", Font.PLAIN, 32));
+        y = GAME_HEIGHT / 3;
+        if (gameState == 2) {
+            x = GAME_WIDTH / 4;
+            g.drawString("Congratulations! You won!", x, y);
+
+        } else if (gameState == -2) {
+            x = 3 * GAME_WIDTH / 8;
+            g.drawString("Oops... You lost.", x, y);
+        }
+
+        // menu
+        x = 10 * GAME_WIDTH / 24;
+        y = 2 * GAME_HEIGHT / 3;
+        g.setFont(new Font("Verdana", Font.PLAIN, 24));
+        g.drawString("PLAY AGAIN", x, y);
+        if (cmd == 0)
+            g.drawString(">", x - 30, y);
+        x = 45 * GAME_WIDTH / 96;
+        y += 50;
+        g.drawString("QUIT", x, y);
+        if (cmd == 1)
+            g.drawString(">", x - 30, y);
     }
 
     // call the draw methods in each class to update positions as things move
@@ -137,9 +167,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         g.setColor(Color.white);
         if (gameState == titleState) {
             drawTitle(g);
-        } else if (gameState == endState) {
+        } else if (gameState == playState) {
             drawGame(g);
-        } else {
+        } else if (Math.abs(gameState) == endState) {
             drawEnd(g);
         }
     }
@@ -160,10 +190,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     public void checkCollision() {
         if (gameState == playState) {
             // score >= 10 -> stop
-            if (PlayerScore.score >= 10)
-                setWinner("you");
-            else if (ComputerScore.score >= 10)
-                setWinner("the computer");
+            if (playerScore >= 10)
+                gameState = 2;
+            else if (computerScore >= 10)
+                gameState = -2;
 
             // stop player paddle if left or right edges hit
             if (paddle.x <= 0) {
@@ -198,7 +228,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             // reset ball if bottom edge hit and paddle not hit
             else if (ball.y >= GAME_HEIGHT - Ball.BALL_DIAMETER) {
                 ball.reset(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
-                ComputerScore.score++;
+                computerScore++;
             }
 
             // bounce if auto paddle hit
@@ -210,14 +240,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             // reset ball if top edge hit and paddle not hit
             else if (ball.y <= npc.y) {
                 ball.reset(GAME_WIDTH / 2 - Ball.BALL_DIAMETER / 2, GAME_HEIGHT / 2 - Ball.BALL_DIAMETER / 2);
-                PlayerScore.score++;
+                playerScore++;
             }
         }
-    }
-
-    public void setWinner(String winner) {
-        gameState = 2;
-        endMessage.message = "Congratuations to " + winner + "!";
     }
 
     // run() method is what makes the game continue running without end. It calls
@@ -261,9 +286,25 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 else if (cmd == 1)
                     System.exit(0);
             }
-        }
-        if (gameState == playState)
+        } else if (gameState == playState)
             paddle.keyPressed(e);
+        else if (Math.abs(gameState) == endState) {
+            if (e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_UP) {
+                cmd = 0;
+            } else if (e.getKeyCode() == KeyEvent.VK_S || e.getKeyCode() == KeyEvent.VK_DOWN) {
+                cmd = 1;
+            } else if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_SPACE) {
+                if (cmd == 0)
+                    gameState = playState;
+                else if (cmd == 1)
+                    System.exit(0);
+            }
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_8)
+            gameState = 2;
+        if (e.getKeyCode() == KeyEvent.VK_9)
+            gameState = -2;
     }
 
     // if a key is released, we'll send it over to the PlayerBall class for
